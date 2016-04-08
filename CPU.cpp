@@ -45,7 +45,7 @@ void CPU::exec(const char *trace_file)
             fprintf(stderr, "Unexpected method: %c\n", method);
             assert(0);
         }
-        printf("%d: %c 0x%08x, lantency %d\n", no, method, addr, latency);
+        //printf("%d: %c 0x%08x, lantency %d\n", no, method, addr, latency);
         this->cycles += latency;
     }
 }
