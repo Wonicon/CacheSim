@@ -34,15 +34,6 @@ protected:
         bool dirty;        /**< 脏位 */
         CacheLine(): tag(0), valid(false), dirty(false) { }
     };
-    /**
-     * @brief 提取地址信息
-     * @param addr 地址
-     * @param tag 输出，标签
-     * @param index 输出，组索引
-     * @param offset 输出，块内偏移
-     */
-    void extract(int addr, int& tag, int& index, int& offset);
-private:
     int count_wr_;               /**< 统计写请求次数 */
     int count_rd_;               /**< 统计读请求次数 */
     int count_wr_miss_;
@@ -55,6 +46,14 @@ private:
     const int cache_depth_;      /**< 组数 */
     CacheLine **ways_;           /**< 优先检索路的 data array */
     Storage& depend_;            /**< 被缓存存储器对象 */
+    /**
+     * @brief 提取地址信息
+     * @param addr 地址
+     * @param tag 输出，标签
+     * @param index 输出，组索引
+     * @param offset 输出，块内偏移
+     */
+    void extract(int addr, int& tag, int& index, int& offset);
     int load_block(int way, int addr);
     int write_back_block(int way, int line);
     int select_victim_way(int line);
