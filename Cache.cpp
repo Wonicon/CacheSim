@@ -132,7 +132,7 @@ int Cache::load_block(int way, int addr)
         // 逐字写入
         for (int i = 0; i < block_size_; i += 4) {
             int data;
-            latency += depend_.read(addr + i, 4, data);
+            latency = depend_.read(addr + i, 4, data);
         }
     }
     else {
@@ -160,7 +160,7 @@ int Cache::write_back_block(int way, int line)
     // 逐字写回
     printf("Write back to %08x\n", addr);
     for (int i = 0; i < block_size_; i += 4) {
-        latency += depend_.write(addr + i, 4);
+        latency = depend_.write(addr + i, 4);
     }
 
     return latency;
