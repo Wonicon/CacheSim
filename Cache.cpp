@@ -129,10 +129,8 @@ int Cache::load_block(int way, int addr)
 
     if (0 <= way && way < n_ways_) {
         // 逐字写入
-        for (int i = 0; i < block_size_; i += 4) {
-            int data;
-            latency = depend_.read(addr + i, 4, data);
-        }
+        int data;
+        latency = depend_.read(addr, block_size_, data);
     }
     else {
         fprintf(stderr, "bad way %d\n", way);
@@ -149,14 +147,8 @@ int Cache::write_back_block(int way, int line)
     int addr = (ways_[way][line].tag << (index_width_ + offset_width_))
                + (line << index_width_);
 
-    int latency = 0;
-
     // 逐字写回
-    for (int i = 0; i < block_size_; i += 4) {
-        latency = depend_.write(addr + i, 4);
-    }
-
-    return latency;
+    return depend_.write(addr, block_size_);
 }
 
 int Cache::select_victim_way(int line)
