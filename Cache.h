@@ -12,18 +12,18 @@ class Cache : public Storage {
 public:
     /**
      * @brief Cache 的构造函数
-     * @param addr_width 地址线的宽度
-     * @param index_width 组索引宽度
-     * @param offset_width 块内偏移地址宽度
+     * @param cache_size cache 的 data 区总大小，单位字节
+     * @param block_size cache 块的大小，单位字节
      * @param n_ways 路数
+     * @param lantency hit 的延迟，单位时钟周期
      * @param mem 依赖的外部存储
      */
-    Cache(int addr_width, int index_width, int offset_width, int n_ways, int latency, Storage& depend);
+    Cache(unsigned int cache_size, unsigned int block_size, int n_ways, int latency, Storage &depend);
     virtual ~Cache();
     virtual int read(int addr, int size, int& data);
     virtual int write(int addr, int size);
     double get_miss_rate() const
-    { return count_miss_ * 100.0 / (count_wr_ + count_rd_); }
+    { return (count_rd_miss_ + count_wr_miss_) * 100.0 / (count_wr_ + count_rd_); }
 protected:
     /**
      * @brief 描述由组索引的一行 cache block 所具有的信息
@@ -45,15 +45,14 @@ protected:
 private:
     int count_wr_;               /**< 统计写请求次数 */
     int count_rd_;               /**< 统计读请求次数 */
-    int count_miss_;             /**< 统计缺失次数 */
+    int count_wr_miss_;
+    int count_rd_miss_;
     const int latency_;          /**< 延迟 */
-    const int addr_width_;       /**< 组索引宽度 */
-    const int index_width_;      /**< 块内偏移宽度 */
+    const int index_width_;      /**< 组索引宽度 */
     const int offset_width_;     /**< 块内偏移宽度 */
     const int n_ways_;           /**< 路数 */
     const int block_size_;       /**< 块大小，字节单位 */
     const int cache_depth_;      /**< 组数 */
-    const int cache_size_;       /**< Cache 总大小，单位字节，只算数据块 */
     CacheLine **ways_;           /**< 优先检索路的 data array */
     Storage& depend_;            /**< 被缓存存储器对象 */
     int load_block(int way, int addr);

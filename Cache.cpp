@@ -6,26 +6,32 @@
 #include <cstdio>
 #include <cstdlib>
 
-Cache::Cache(int addr_width, int index_width, int offset_width, int n_ways, int latency, Storage& depend) :
+/**
+ * @brief 计算表示一个数的对数
+ * @param x 待求解的数
+ * @return 计算结果
+ *
+ * c++11 的 constexpr 只支持递归迭代（因为只能有一句 return）
+ * 且是內联函数
+ */
+constexpr unsigned int log2(unsigned int x)
+{
+    return x == 1 ? 0 : 1 + log2(x >> 1);
+}
+
+Cache::Cache(unsigned int cache_size, unsigned int block_size, int n_ways, int latency, Storage &depend) :
 count_wr_(0),
 count_rd_(0),
-count_miss_(0),
-addr_width_(addr_width),
-index_width_(index_width),
-offset_width_(offset_width),
+count_wr_miss_(0),
+count_rd_miss_(0),
 n_ways_(n_ways),
 latency_(latency),
-block_size_(1 << offset_width_),
-cache_depth_(1 << index_width_),
-cache_size_(block_size_ * cache_depth_),
+offset_width_(log2(block_size)),
+block_size_(block_size),
+index_width_(log2(cache_size / block_size / n_ways)),
+cache_depth_(cache_size / block_size / n_ways),
 depend_(depend)
 {
-    if (addr_width < index_width + offset_width) {
-        fprintf(stderr, "addr_width(%d) is less than index_width(%d) + offset_width(%d)\n",
-                addr_width_, index_width_, offset_width_);
-        exit(-1);
-    }
-
     if (n_ways_ <= 0) {
         fprintf(stderr, "n_ways(%d) should > 0\n", n_ways_);
         exit(-1);
@@ -70,7 +76,7 @@ int Cache::read(int addr, int size, int& data)
     }
 
     // Miss
-    count_miss_++;
+    count_rd_miss_++;
     int latency = 0;
     int way = this->select_victim_way(index);
     if (ways_[way][index].dirty) {
@@ -99,7 +105,7 @@ int Cache::write(int addr, int size)
     }
 
     // Miss
-    count_miss_++;
+    count_wr_miss_++;
     int latency = 0;
     int way = this->select_victim_way(index);
     if (ways_[way][index].dirty) {

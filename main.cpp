@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
 {
     {
         Memory ram(100);
-        Cache cache(32, 20, 4, 4, 10, ram);
+        Cache cache(128 * 1024, 8 * 4, 4, 10, ram);
         CPU cpu(cache);
         cpu.exec(argv[1]);
         printf("cpu cycles: %d\n", cpu.getCycles());
