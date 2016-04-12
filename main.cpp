@@ -10,20 +10,34 @@
 int main(int argc, char *argv[])
 {
     {
-        Memory ram(100);
-        Cache cache(128 * 1024, 8 * 4, 4, 10, ram);
-        CPU cpu(cache);
-        cpu.exec(argv[1]);
-        printf("cpu cycles: %d\n", cpu.getCycles());
-        printf("mem access: %d\n", ram.getAccessTimes());
-        printf("miss rate %f\n", cache.get_miss_rate());
-    }
-    {
+        printf("Test directly using ram\n");
         Memory ram(100);
         CPU cpu(ram);
         cpu.exec(argv[1]);
         printf("cpu cycles: %d\n", cpu.getCycles());
         printf("mem access: %d\n", ram.getAccessTimes());
+    }
+    {
+        printf("Test using L1 cache\n");
+        Memory ram(100);
+        Cache L1(128 * 1024, 8 * 4, 4, 1, ram);
+        CPU cpu(L1);
+        cpu.exec(argv[1]);
+        printf("cpu cycles: %d\n", cpu.getCycles());
+        printf("mem access: %d\n", ram.getAccessTimes());
+        printf("miss rate %f\n", L1.get_miss_rate());
+    }
+    {
+        printf("Test using L1 + L2 cache\n");
+        Memory ram(100);
+        Cache L2(2 * 1024 * 1024, 128, 8, 10, ram);
+        Cache L1(32 * 1024, 32, 4, 1, L2);
+        CPU cpu(L1);
+        cpu.exec(argv[1]);
+        printf("cpu cycles: %d\n", cpu.getCycles());
+        printf("mem access: %d\n", ram.getAccessTimes());
+        printf("L2 miss rate: %f\n", L2.get_miss_rate());
+        printf("L1 miss rate: %f\n", L1.get_miss_rate());
     }
     return 0;
 }

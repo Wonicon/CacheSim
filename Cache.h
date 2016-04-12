@@ -60,5 +60,4 @@ private:
     int select_victim_way(int line);
 };
 
-
 #endif //CACHESIM_CACHE_H

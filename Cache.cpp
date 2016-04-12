@@ -124,7 +124,6 @@ int Cache::load_block(int way, int addr)
     this->extract(addr, tag, index, offset);
 
     addr = addr & ~((1 << offset_width_) - 1);  // 按块对齐
-    printf("Load addr %08x index %d, way %d\n", addr, index, way);
 
     int latency = 0;
 
@@ -146,11 +145,6 @@ int Cache::load_block(int way, int addr)
 
 int Cache::write_back_block(int way, int line)
 {
-    if (!(0 <= way && way < n_ways_)) {
-        fprintf(stderr, "bad way %d\n", way);
-        way = 0;
-    }
-
     // 拼凑写回地址
     int addr = (ways_[way][line].tag << (index_width_ + offset_width_))
                + (line << index_width_);
@@ -158,7 +152,6 @@ int Cache::write_back_block(int way, int line)
     int latency = 0;
 
     // 逐字写回
-    printf("Write back to %08x\n", addr);
     for (int i = 0; i < block_size_; i += 4) {
         latency = depend_.write(addr + i, 4);
     }
@@ -171,14 +164,12 @@ int Cache::select_victim_way(int line)
     // 优先找无效的
     for (int i = 0; i < n_ways_; i++) {
         if (!ways_[i][line].valid) {
-            printf("invalid victim\n");
             return i;
         }
     }
     // 然后是不脏的
     for (int i = 0; i < n_ways_; i++) {
         if (!ways_[i][line].dirty) {
-            printf("undirty victim\n");
             return i;
         }
     }
