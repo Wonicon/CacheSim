@@ -29,3 +29,34 @@ int VictimCache::read(int addr, int size, int& data)
     // 既不载入、也不替换，相当于把访存转发给上层 cache
     return latency_ + depend_.read(addr, size, data);
 }
+
+int VictimCache::write(int addr, int size)
+{
+    count_wr_++;
+
+    int tag, index, offset;
+    this->extract(addr, tag, index, offset);
+
+    for (int i = 0; i < n_ways_; i++) {
+        auto& cache_line = ways_[i][index];
+        if (cache_line.valid && (cache_line.tag == tag)) {
+            // TODO 修改块内数据
+            cache_line.dirty = true;
+            return latency_;
+        }
+    }
+
+    // Miss
+    count_wr_miss_++;
+    int latency = 0;
+    int way = this->select_victim_way(index);
+    if (ways_[way][index].dirty) {
+        latency += this->write_back_block(way, index);
+    }
+
+    ways_[way][index].valid = true;
+    ways_[way][index].tag = tag;
+    // TODO 修改块内数据
+    ways_[way][index].dirty = true;
+    return latency_ + latency;
+}

@@ -165,5 +165,6 @@ int Cache::select_victim_way(int line)
             return i;
         }
     }
+
     return static_cast<unsigned>(rand()) % n_ways_;
 }

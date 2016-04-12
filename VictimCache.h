@@ -18,6 +18,7 @@ class VictimCache : public Cache {
 public:
     VictimCache(unsigned int cache_size, unsigned block_size, Storage& depend);
     virtual int read(int addr, int size, int& data);
+    virtual int write(int addr, int size);
 private:
 };
 

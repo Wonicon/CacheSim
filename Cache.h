@@ -24,6 +24,12 @@ public:
     virtual int write(int addr, int size);
     double get_miss_rate() const
     { return (count_rd_miss_ + count_wr_miss_) * 100.0 / (count_wr_ + count_rd_); }
+    int get_nr_read() const { return count_rd_; }
+    int get_nr_write() const { return count_wr_; }
+    int get_nr_access() const { return count_rd_ + count_wr_; }
+    int get_nr_read_miss() const { return count_rd_miss_; }
+    int get_nr_write_miss() const { return count_wr_miss_; }
+    int get_nr_access_miss() const { return count_rd_miss_ + count_wr_miss_; }
 protected:
     /**
      * @brief 描述由组索引的一行 cache block 所具有的信息

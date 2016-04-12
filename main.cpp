@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
     {
         printf("Test using L1 cache\n");
         Memory ram(100);
-        Cache L1(128 * 1024, 8 * 4, 4, 1, ram);
+        Cache L1(32 * 1024, 32, 4, 1, ram);
         CPU cpu(L1);
         cpu.exec(argv[1]);
         printf("cpu cycles: %d\n", cpu.getCycles());
@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
         Memory ram(100);
         Cache L2(2 * 1024 * 1024, 128, 8, 10, ram);
         VictimCache victim(32 * 32, 32, L2);
-        Cache L1(32 * 1024, 32, 2, 10, victim);
+        Cache L1(32 * 1024, 32, 4, 1, victim);
         CPU cpu(L1);
         cpu.exec(argv[1]);
         printf("cpu cycles: %d\n", cpu.getCycles());
@@ -53,6 +53,9 @@ int main(int argc, char *argv[])
         printf("L2 miss rate: %f\n", L2.get_miss_rate());
         printf("victim miss rate: %f\n", victim.get_miss_rate());
         printf("L1 miss rate: %f\n", L1.get_miss_rate());
+        printf("vic rd %d(%d) wr %d(%d)\n",
+               victim.get_nr_read(), victim.get_nr_read_miss(),
+               victim.get_nr_write(), victim.get_nr_write_miss());
     }
     return 0;
 }
