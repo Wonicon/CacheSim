@@ -55,7 +55,7 @@ int VictimCache::accept(int addr, int data[], int size, bool is_dirty)
     int latency = 0;
     int way = this->select_victim_way(index);
     if (ways_[way][index].dirty) {
-        latency += this->write_back_block(way, index);
+        latency = this->write_back_block(way, index);
     }
 
     ways_[way][index].valid = true;

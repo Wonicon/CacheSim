@@ -77,14 +77,15 @@ int Cache::read(int addr, int size, int& data)
 
     // Miss
     count_rd_miss_++;
-    int latency = 0;
     int way = this->select_victim_way(index);
 
-    latency += this->evict(way, index);
+    this->evict(way, index);
+
     if (ways_[way][index].dirty) {
-        latency += this->write_back_block(way, index);
+        this->write_back_block(way, index);
     }
-    latency += this->load_block(way, addr);
+
+    int latency = this->load_block(way, addr);
 
     // TODO 读取块内数据
     return latency_ + latency;
