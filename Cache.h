@@ -63,6 +63,12 @@ protected:
     int load_block(int way, int addr);
     int write_back_block(int way, int line);
     int select_victim_way(int line);
+    /**
+     * @brief 明确对特定 cache line 的抛弃
+     *
+     * 主要用于计算地址然后让后端自行决策如何处理
+     */
+    int evict(int way, int index);
 };
 
 #endif //CACHESIM_CACHE_H

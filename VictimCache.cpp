@@ -32,16 +32,20 @@ int VictimCache::read(int addr, int size, int& data)
 
 int VictimCache::write(int addr, int size)
 {
-    count_wr_++;
+    return 0;
+}
 
+int VictimCache::accept(int addr, int data[], int size, bool is_dirty)
+{
+    count_wr_++;
     int tag, index, offset;
     this->extract(addr, tag, index, offset);
 
     for (int i = 0; i < n_ways_; i++) {
         auto& cache_line = ways_[i][index];
         if (cache_line.valid && (cache_line.tag == tag)) {
-            // TODO 修改块内数据
-            cache_line.dirty = true;
+            // 修改数据
+            cache_line.dirty = is_dirty;
             return latency_;
         }
     }
@@ -56,7 +60,6 @@ int VictimCache::write(int addr, int size)
 
     ways_[way][index].valid = true;
     ways_[way][index].tag = tag;
-    // TODO 修改块内数据
-    ways_[way][index].dirty = true;
+    ways_[way][index].dirty = is_dirty;
     return latency_ + latency;
 }

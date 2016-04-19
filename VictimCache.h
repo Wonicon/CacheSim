@@ -19,6 +19,7 @@ public:
     VictimCache(unsigned int cache_size, unsigned block_size, Storage& depend);
     virtual int read(int addr, int size, int& data);
     virtual int write(int addr, int size);
+    virtual int accept(int addr, int data[], int size, bool is_dirty) override;
 private:
 };
 

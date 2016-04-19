@@ -79,6 +79,8 @@ int Cache::read(int addr, int size, int& data)
     count_rd_miss_++;
     int latency = 0;
     int way = this->select_victim_way(index);
+
+    latency += this->evict(way, index);
     if (ways_[way][index].dirty) {
         latency += this->write_back_block(way, index);
     }
@@ -108,6 +110,8 @@ int Cache::write(int addr, int size)
     count_wr_miss_++;
     int latency = 0;
     int way = this->select_victim_way(index);
+
+    latency += this->evict(way, index);
     if (ways_[way][index].dirty) {
         latency += this->write_back_block(way, index);
     }
@@ -145,7 +149,7 @@ int Cache::write_back_block(int way, int line)
 {
     // 拼凑写回地址
     int addr = (ways_[way][line].tag << (index_width_ + offset_width_))
-               + (line << index_width_);
+               + (line << index_width_);  // FIXME
 
     // 逐字写回
     return depend_.write(addr, block_size_);
@@ -167,4 +171,11 @@ int Cache::select_victim_way(int line)
     }
 
     return static_cast<unsigned>(rand()) % n_ways_;
+}
+
+int Cache::evict(int way, int line)
+{
+    // 计算块地址
+    int addr = (ways_[way][line].tag << (index_width_ + offset_width_)) + (line << offset_width_);
+    return depend_.accept(addr, NULL, block_size_ / 4, ways_[way][line].dirty);  // TODO Confirm element size!
 }
