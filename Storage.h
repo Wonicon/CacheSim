@@ -28,8 +28,10 @@ public:
     virtual int write(int addr, int size) = 0;
     /**
      * @brief 存储器接收写回数据，大部分情况下不处理
+     *
+     * TODO 用这个接口来实现写回行为
      */
-    virtual int accept(int addr, int data[], int size, bool is_dirty) { return 0; }
+    virtual int accept(int addr, int data[], int size, bool is_dirty, bool is_victim = false, int cause = 0) { return 0; }
 };
 
 

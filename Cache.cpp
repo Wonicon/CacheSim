@@ -86,7 +86,9 @@ int Cache::read(int addr, int size, int& data)
     log("cache read miss, evict way %d at index %d, which is %s", way, index,
             ways_[way][index].dirty ? "dirty" : "not dirty");
 
-    this->evict(way, index);
+    if (ways_[way][index].valid) {
+        this->evict(way, index, addr);
+    }
 
     if (ways_[way][index].dirty) {
         this->write_back_block(way, index);
@@ -123,7 +125,10 @@ int Cache::write(int addr, int size)
     log("cache write miss, evict way %d at index %d, which is %s", way, index,
             ways_[way][index].dirty ? "dirty" : "not dirty");
 
-    this->evict(way, index);
+    if (ways_[way][index].valid) {
+        this->evict(way, index, addr);
+    }
+
     if (ways_[way][index].dirty) {
         this->write_back_block(way, index);
     }
@@ -187,9 +192,9 @@ int Cache::select_victim_way(int line)
     return static_cast<unsigned>(rand()) % n_ways_;
 }
 
-int Cache::evict(int way, int line)
+int Cache::evict(int way, int line, int cause)
 {
     // 计算块地址
     int addr = (ways_[way][line].tag << (index_width_ + offset_width_)) + (line << offset_width_);
-    return depend_.accept(addr, NULL, block_size_ / 4, ways_[way][line].dirty);  // TODO Confirm element size!
+    return depend_.accept(addr, NULL, block_size_ / 4, ways_[way][line].dirty, true, cause);  // TODO Confirm element size!
 }

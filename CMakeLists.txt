@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.4)
 project(CacheSim)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0 -std=c++11")
 
 set(SOURCE_FILES
         Storage.h

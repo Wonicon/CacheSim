@@ -70,7 +70,7 @@ protected:
      *
      * 主要用于计算地址然后让后端自行决策如何处理
      */
-    int evict(int way, int index);
+    int evict(int way, int index, int cause);
 };
 
 #endif //CACHESIM_CACHE_H
