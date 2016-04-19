@@ -3,6 +3,7 @@
 //
 
 #include "Cache.h"
+#include "debug.h"
 #include <cstdio>
 #include <cstdlib>
 
@@ -67,6 +68,8 @@ int Cache::read(int addr, int size, int& data)
     int tag, index, offset;
     this->extract(addr, tag, index, offset);
 
+    log("cache read on %08x [tag %x, index %d, offset %d]", addr, tag, index, offset);
+
     for (int i = 0; i < n_ways_; i++) {
         auto& cache_line = ways_[i][index];
         if (cache_line.valid && (cache_line.tag == tag)) {
@@ -78,6 +81,9 @@ int Cache::read(int addr, int size, int& data)
     // Miss
     count_rd_miss_++;
     int way = this->select_victim_way(index);
+
+    log("cache read miss, evict way %d at index %d, which is %s", way, index,
+            ways_[way][index].dirty ? "dirty" : "not dirty");
 
     this->evict(way, index);
 
@@ -98,6 +104,8 @@ int Cache::write(int addr, int size)
     int tag, index, offset;
     this->extract(addr, tag, index, offset);
 
+    log("cache write on %08x [tag %x, index %d, offset %d", addr, tag, index, offset);
+
     for (int i = 0; i < n_ways_; i++) {
         auto& cache_line = ways_[i][index];
         if (cache_line.valid && (cache_line.tag == tag)) {
@@ -111,9 +119,12 @@ int Cache::write(int addr, int size)
     count_wr_miss_++;
     int way = this->select_victim_way(index);
 
+    log("cache write miss, evict way %d at index %d, which is %s", way, index,
+            ways_[way][index].dirty ? "dirty" : "not dirty");
+
     this->evict(way, index);
     if (ways_[way][index].dirty) {
-        latency += this->write_back_block(way, index);
+        this->write_back_block(way, index);
     }
     int latency = this->load_block(way, addr);
 

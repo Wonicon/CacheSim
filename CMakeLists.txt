@@ -7,7 +7,7 @@ set(SOURCE_FILES
         Storage.h
         Memory.cpp Memory.h
         CPU.cpp CPU.h
-        main.cpp Cache.cpp Cache.h VictimCache.cpp VictimCache.h)
+        main.cpp Cache.cpp Cache.h VictimCache.cpp VictimCache.h debug.h debug.cpp)
 
 include_directories(.)
 
