@@ -149,7 +149,7 @@ int Cache::write_back_block(int way, int line)
 {
     // 拼凑写回地址
     int addr = (ways_[way][line].tag << (index_width_ + offset_width_))
-               + (line << index_width_);  // FIXME
+               + (line << offset_width_);
 
     // 逐字写回
     return depend_.write(addr, block_size_);
