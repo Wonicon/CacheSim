@@ -3,7 +3,7 @@
 
 #include <cstdio>
 
-#define DEBUG
+//#define DEBUG
 
 #ifdef DEBUG
 

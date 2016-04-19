@@ -23,6 +23,7 @@ constexpr unsigned int log2(unsigned int x)
 Cache::Cache(unsigned int cache_size, unsigned int block_size, int n_ways, int latency, Storage &depend) :
 count_wr_(0),
 count_rd_(0),
+count_wb_(0),
 count_wr_miss_(0),
 count_rd_miss_(0),
 n_ways_(n_ways),
@@ -158,6 +159,8 @@ int Cache::load_block(int way, int addr)
 
 int Cache::write_back_block(int way, int line)
 {
+    count_wb_++;
+
     // 拼凑写回地址
     int addr = (ways_[way][line].tag << (index_width_ + offset_width_))
                + (line << offset_width_);

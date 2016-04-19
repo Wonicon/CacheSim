@@ -27,6 +27,7 @@ public:
     int get_nr_read() const { return count_rd_; }
     int get_nr_write() const { return count_wr_; }
     int get_nr_access() const { return count_rd_ + count_wr_; }
+    int get_nr_writeback() const { return count_wb_; }
     int get_nr_read_miss() const { return count_rd_miss_; }
     int get_nr_write_miss() const { return count_wr_miss_; }
     int get_nr_access_miss() const { return count_rd_miss_ + count_wr_miss_; }
@@ -42,6 +43,7 @@ protected:
     };
     int count_wr_;               /**< 统计写请求次数 */
     int count_rd_;               /**< 统计读请求次数 */
+    int count_wb_;               /**< 统计写回次数 */
     int count_wr_miss_;
     int count_rd_miss_;
     const int latency_;          /**< 延迟 */
