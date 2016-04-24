@@ -22,7 +22,7 @@ constexpr unsigned int log2(unsigned int x)
     return x == 1 ? 0 : 1 + log2(x >> 1);
 }
 
-Cache::Cache(const char *name, unsigned int cache_size, unsigned int block_size, int n_ways, int latency, Storage &depend) :
+Cache::Cache(const char *name, unsigned int cache_size, unsigned int block_size, int n_ways, int latency, Storage &depend, bool use_lru) :
 label_(name),
 count_wr_(0),
 count_rd_(0),
@@ -35,7 +35,8 @@ offset_width_(log2(block_size)),
 block_size_(block_size),
 index_width_(log2(cache_size / block_size / n_ways)),
 cache_depth_(cache_size / block_size / n_ways),
-depend_(depend)
+depend_(depend),
+use_lru_(use_lru)
 {
     if (n_ways_ <= 0) {
         fprintf(stderr, "n_ways(%d) should > 0\n", n_ways_);
@@ -200,7 +201,18 @@ int Cache::select_victim_way(int line)
         }
     }
 
-    return static_cast<unsigned>(rand()) % n_ways_;
+    if (use_lru_) {
+        int max_way = 0;
+        for (int i = 1; i < n_ways_; i++) {
+            if (ways_[i][line].age > ways_[max_way][line].age) {
+                max_way = i;
+            }
+        }
+        return max_way;
+    }
+    else {
+        return static_cast<unsigned>(rand()) % n_ways_;
+    }
 }
 
 int Cache::evict(int way, int line, int cause)

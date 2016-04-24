@@ -19,7 +19,7 @@ public:
      * @param lantency hit 的延迟，单位时钟周期
      * @param mem 依赖的外部存储
      */
-    Cache(const char *name, unsigned int cache_size, unsigned int block_size, int n_ways, int latency, Storage &depend);
+    Cache(const char *name, unsigned int cache_size, unsigned int block_size, int n_ways, int latency, Storage &depend, bool use_lru = false);
     virtual ~Cache();
     virtual int read(int addr, int size, CacheLine *block = nullptr);
     virtual int write(int addr, int size);
@@ -35,6 +35,7 @@ public:
     void summary() const;
 protected:
     const char *label_;
+    bool use_lru_;
     int count_wr_;               /**< 统计写请求次数 */
     int count_rd_;               /**< 统计读请求次数 */
     int count_wb_;               /**< 统计写回次数 */

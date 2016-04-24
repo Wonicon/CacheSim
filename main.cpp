@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
         printf("Test victim cache\n>>>>>>>>>>>>>>>\n");
         Memory ram(100);
         Cache L2("L2", 2 * 1024 * 1024, 128, n_ways, 10, ram);
-        VictimCache victim("Victim", 32 * 32, 32, L2);
+        VictimCache victim("Victim", 32 * 32, 32, L2, false);
         Cache L1("L1", 32 * 1024, 32, 4, 1, victim);
         CPU cpu(L1);
         cpu.exec(argv[1]);

@@ -16,7 +16,7 @@ struct CacheLine {
     bool dirty;        /**< 脏位 */
     int age;           /**< LRU，每次访问都会增长，每次访问命中都不会增长*/
     std::vector<int> tag_history;
-    CacheLine(): tag(0), valid(false), dirty(false) { }
+    CacheLine(): tag(0), valid(false), dirty(false), age(0) { }
     void update_tag(int new_tag) { if (valid) tag_history.push_back(tag); tag = new_tag; }
 };
 

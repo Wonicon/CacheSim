@@ -8,8 +8,8 @@
 #include <cstdlib>
 #include <cassert>
 
-VictimCache::VictimCache(const char *name, unsigned int cache_size, unsigned int block_size, Storage& depend) :
-Cache(name, cache_size, block_size, cache_size / block_size, 1, depend)
+VictimCache::VictimCache(const char *name, unsigned int cache_size, unsigned int block_size, Storage &depend, bool use_lru) :
+Cache(name, cache_size, block_size, cache_size / block_size, 1, depend, use_lru)
 { }
 
 int VictimCache::read(int addr, int size, CacheLine *block)
