@@ -3,14 +3,16 @@
 
 #include <cstdio>
 
-//#define DEBUG
+#define DEBUG
 
 #ifdef DEBUG
 
 extern FILE *logfile;
 
+extern int n_instr;
+
 #define log(fmt, ...) \
-    fprintf(logfile, "[%s#%s:%d] " fmt "\n", __FILE__, __FUNCTION__, __LINE__, ## __VA_ARGS__)
+    fprintf(logfile, "[%5d] " fmt "\n", n_instr, ## __VA_ARGS__)
 
 #else
 

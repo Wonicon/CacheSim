@@ -2,6 +2,7 @@
 // Created by wonicon on 16-3-31.
 //
 
+#include "debug.h"
 #include "CPU.h"
 #include <cstdio>
 #include <cstdlib>
@@ -34,6 +35,7 @@ void CPU::exec(const char *trace_file)
     while (fscanf(trace, "%s%x%d", &method, &addr, &interval) != EOF) {
         no++;
         this->cycles += interval;
+        n_instr++;
         int latency = 0;
         if (method == LOAD) {
             latency = this->mem.read(addr, SIZE, data);
@@ -45,7 +47,6 @@ void CPU::exec(const char *trace_file)
             fprintf(stderr, "Unexpected method: %c\n", method);
             assert(0);
         }
-        //printf("%d: %c 0x%08x, lantency %d\n", no, method, addr, latency);
         this->cycles += latency;
     }
 }

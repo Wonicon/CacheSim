@@ -6,6 +6,8 @@
 #include "debug.h"
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
+#include <cassert>
 
 /**
  * @brief 计算表示一个数的对数
@@ -20,7 +22,8 @@ constexpr unsigned int log2(unsigned int x)
     return x == 1 ? 0 : 1 + log2(x >> 1);
 }
 
-Cache::Cache(unsigned int cache_size, unsigned int block_size, int n_ways, int latency, Storage &depend) :
+Cache::Cache(const char *name, unsigned int cache_size, unsigned int block_size, int n_ways, int latency, Storage &depend) :
+label_(name),
 count_wr_(0),
 count_rd_(0),
 count_wb_(0),
@@ -69,8 +72,6 @@ int Cache::read(int addr, int size, int& data)
     int tag, index, offset;
     this->extract(addr, tag, index, offset);
 
-    log("cache read on %08x [tag %x, index %d, offset %d]", addr, tag, index, offset);
-
     for (int i = 0; i < n_ways_; i++) {
         auto& cache_line = ways_[i][index];
         if (cache_line.valid && (cache_line.tag == tag)) {
@@ -83,10 +84,14 @@ int Cache::read(int addr, int size, int& data)
     count_rd_miss_++;
     int way = this->select_victim_way(index);
 
-    log("cache read miss, evict way %d at index %d, which is %s", way, index,
-            ways_[way][index].dirty ? "dirty" : "not dirty");
+    log("%6s  read miss at 0x%08x [tag %d index %d offset %d]",
+            label_, addr, tag, index, offset);
 
     if (ways_[way][index].valid) {
+
+        log("%6s evict way %d [tag %d], which is %s",
+                label_, way, ways_[way][index].tag, ways_[way][index].dirty ? "dirty" : "not dirty");
+
         this->evict(way, index, addr);
     }
 
@@ -107,8 +112,6 @@ int Cache::write(int addr, int size)
     int tag, index, offset;
     this->extract(addr, tag, index, offset);
 
-    log("cache write on %08x [tag %x, index %d, offset %d", addr, tag, index, offset);
-
     for (int i = 0; i < n_ways_; i++) {
         auto& cache_line = ways_[i][index];
         if (cache_line.valid && (cache_line.tag == tag)) {
@@ -122,10 +125,14 @@ int Cache::write(int addr, int size)
     count_wr_miss_++;
     int way = this->select_victim_way(index);
 
-    log("cache write miss, evict way %d at index %d, which is %s", way, index,
-            ways_[way][index].dirty ? "dirty" : "not dirty");
+    log("%6s write miss at 0x%08x [tag %d index %d offset %d]",
+            label_, addr, tag, index, offset);
 
     if (ways_[way][index].valid) {
+
+        log("%6s evict way %d [tag %d], which is %s",
+                label_, way, ways_[way][index].tag, ways_[way][index].dirty ? "dirty" : "not dirty");
+
         this->evict(way, index, addr);
     }
 
@@ -136,6 +143,7 @@ int Cache::write(int addr, int size)
 
     // TODO 修改块内数据
     ways_[way][index].dirty = true;
+    if (!ways_[way][index].tag_history.empty()) *(ways_[way][index].tag_history.end() - 1) *= -1;
     return latency_ + latency;
 }
 
@@ -157,8 +165,9 @@ int Cache::load_block(int way, int addr)
         fprintf(stderr, "bad way %d\n", way);
     }
 
-    ways_[way][index].tag = tag;
+    ways_[way][index].update_tag(tag);
     ways_[way][index].valid = true;
+    ways_[way][index].dirty = false; // TODO wrong!
     return latency;
 }
 
@@ -170,6 +179,7 @@ int Cache::write_back_block(int way, int line)
     int addr = (ways_[way][line].tag << (index_width_ + offset_width_))
                + (line << offset_width_);
 
+    log("%6s writes back 0x%08x [way %d]", label_, addr, way);
     // 逐字写回
     return depend_.write(addr, block_size_);
 }
@@ -197,4 +207,15 @@ int Cache::evict(int way, int line, int cause)
     // 计算块地址
     int addr = (ways_[way][line].tag << (index_width_ + offset_width_)) + (line << offset_width_);
     return depend_.accept(addr, NULL, block_size_ / 4, ways_[way][line].dirty, true, cause);  // TODO Confirm element size!
+}
+
+void Cache::summary() const
+{
+    int n = 0;
+    for (int i = 0; i < n_ways_; i++) {
+        for (int j = 0; j < cache_depth_; j++) {
+            if (ways_[i][j].valid) n++;
+        }
+    }
+    printf("cache util %d/%d\n", n, n_ways_ * cache_depth_);
 }
