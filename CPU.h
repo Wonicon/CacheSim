@@ -29,6 +29,10 @@ public:
      * @brief
      */
     int getCycles(void) const;
+    /**
+     * @brief 输出统计信息
+     */
+    void summary() const;
 private:
     /**
      * @brief 依赖的存储器，抽象类型，内部可能有多层结构
@@ -38,6 +42,10 @@ private:
      * @brief 时钟周期计数
      */
     int cycles;
+    /**
+     * @brief 指令计数
+     */
+    int nr_instrs_;
 };
 
 

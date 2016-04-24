@@ -10,7 +10,8 @@
 
 CPU::CPU(Storage &storage) :
 mem(storage),
-cycles(0)
+cycles(0),
+nr_instrs_(0)
 {}
 
 void CPU::exec(const char *trace_file)
@@ -35,7 +36,7 @@ void CPU::exec(const char *trace_file)
     while (fscanf(trace, "%s%x%d", &method, &addr, &interval) != EOF) {
         no++;
         this->cycles += interval;
-        n_instr++;
+        nr_instrs_++;
         int latency = 0;
         if (method == LOAD) {
             latency = this->mem.read(addr, SIZE);
@@ -54,4 +55,11 @@ void CPU::exec(const char *trace_file)
 int CPU::getCycles() const
 {
     return cycles;
+}
+
+void CPU::summary() const
+{
+    printf("CPU instrs: %d\n", nr_instrs_);
+    printf("CPU cycles: %d\n", cycles);
+    mem.summary();
 }

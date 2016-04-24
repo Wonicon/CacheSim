@@ -6,6 +6,7 @@
 #define CACHESIM_MEMORY_H
 
 
+#include <cstdio>
 #include "Storage.h"
 
 /**
@@ -17,6 +18,7 @@ public:
     virtual int read(int addr, int size, CacheLine *block = nullptr);
     virtual int write(int addr, int size);
     int getAccessTimes(void) const { return read_counter + write_counter; }
+    void summary() const override;
 private:
     int latency;
     int read_counter;

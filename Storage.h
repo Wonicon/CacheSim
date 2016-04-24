@@ -6,6 +6,7 @@
 #define CACHESIM_STORAGE_H
 
 #include <vector>
+#include <cstdio>
 
 /**
  * @brief 描述由组索引的一行 cache block 所具有的信息
@@ -46,6 +47,10 @@ public:
      * TODO 用这个接口来实现写回行为
      */
     virtual int accept(int addr, int data[], int size, bool is_dirty, bool is_victim = false, int cause = 0) { return 0; }
+    /**
+     * @brief 输出统计信息
+     */
+    virtual void summary() const = 0;
 };
 
 

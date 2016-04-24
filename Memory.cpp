@@ -26,3 +26,10 @@ int Memory::write(int addr, int size)
     this->write_counter++;
     return latency;
 }
+
+void Memory::summary() const
+{
+    printf("Memory access: %d\n", read_counter + write_counter);
+    printf("Memory loads: %d\n", read_counter);
+    printf("Memory stores: %d\n", write_counter);
+}

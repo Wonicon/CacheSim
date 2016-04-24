@@ -8,6 +8,7 @@
 
 #include "Storage.h"
 #include <vector>
+#include <cstdio>
 
 #define LRU false
 

@@ -3,13 +3,14 @@
 
 #include <cstdio>
 
-#define DEBUG
-
-#ifdef DEBUG
+//#define DEBUG
 
 extern FILE *logfile;
 
 extern int n_instr;
+
+#ifdef DEBUG
+
 
 #define log(fmt, ...) \
     fprintf(logfile, "[%5d] " fmt "\n", n_instr, ## __VA_ARGS__)

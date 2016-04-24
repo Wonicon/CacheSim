@@ -232,11 +232,8 @@ int Cache::evict(int way, int line, int cause)
 
 void Cache::summary() const
 {
-    int n = 0;
-    for (int i = 0; i < n_ways_; i++) {
-        for (int j = 0; j < cache_depth_; j++) {
-            if (ways_[i][j].valid) n++;
-        }
-    }
-    printf("cache util %d/%d\n", n, n_ways_ * cache_depth_);
+    printf("%s access: %d\n", label_, count_rd_ + count_wr_);
+    printf("%s loads: %d\n", label_, count_rd_);
+    printf("%s stores: %d\n", label_, count_wr_);
+    depend_.summary();
 }
