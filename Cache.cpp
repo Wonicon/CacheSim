@@ -77,6 +77,7 @@ int Cache::read(int addr, int size, CacheLine *block)
             // TODO 读取块内数据
             if (block) {
                 block->dirty = false;  // 由于有备份，无需传递脏信息
+                block->age = 0;
             }
             return latency_;
         }

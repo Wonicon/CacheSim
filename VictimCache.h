@@ -26,6 +26,7 @@ public:
 private:
     bool is_waiting_swap_ = false;
     int addr_to_swap_ = -1;
+    CacheLine swap_line = {};
 };
 
 

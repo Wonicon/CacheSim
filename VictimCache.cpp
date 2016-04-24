@@ -21,7 +21,8 @@ int VictimCache::read(int addr, int size, CacheLine *block)
         if (request == addr_to_swap_) {
             is_waiting_swap_ = false;
             if (block) {
-                block->dirty = true;  // 由于无备份，需要传递脏信息
+                block->dirty = swap_line.dirty;  // 由于无备份，需要传递脏信息
+                block->age = swap_line.age;
             }
             return latency_;
         }
@@ -69,6 +70,7 @@ int VictimCache::accept(int addr, int data[], int size, bool is_dirty, bool is_v
                 // Swap
                 is_waiting_swap_ = true;
                 addr_to_swap_ = (cause >> offset_width_) << offset_width_;
+                swap_line = cache_line;
                 this->extract(addr, tag, index, offset);
                 //cache_line.tag = tag;
                 cache_line.update_tag(tag);
