@@ -46,7 +46,7 @@ int VictimCache::read(int addr, int size, CacheLine *block)
             label_, addr, tag, index);
 
     // 既不载入、也不替换，相当于把访存转发给上层 cache
-    return latency_ + depend_.read(addr, size);
+    return latency_ + depend_.read(addr, size, block);
 }
 
 int VictimCache::write(int addr, int size)
