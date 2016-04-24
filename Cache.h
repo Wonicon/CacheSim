@@ -9,6 +9,8 @@
 #include "Storage.h"
 #include <vector>
 
+#define LRU false
+
 class Cache : public Storage {
 public:
     /**
@@ -19,7 +21,7 @@ public:
      * @param lantency hit 的延迟，单位时钟周期
      * @param mem 依赖的外部存储
      */
-    Cache(const char *name, unsigned int cache_size, unsigned int block_size, int n_ways, int latency, Storage &depend, bool use_lru = false);
+    Cache(const char *name, unsigned int cache_size, unsigned int block_size, int n_ways, int latency, Storage &depend, bool use_lru = LRU);
     virtual ~Cache();
     virtual int read(int addr, int size, CacheLine *block = nullptr);
     virtual int write(int addr, int size);

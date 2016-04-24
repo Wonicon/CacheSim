@@ -33,9 +33,14 @@ int VictimCache::read(int addr, int size, CacheLine *block)
     this->extract(addr, tag, index, offset);
 
     for (int i = 0; i < n_ways_; i++) {
+        ways_[i][index].age++;
+    }
+
+    for (int i = 0; i < n_ways_; i++) {
         auto& cache_line = ways_[i][index];
         if (cache_line.valid && (cache_line.tag == tag)) {
             // TODO 读取块内数据
+            cache_line.age--;
             return latency_;
         }
     }
@@ -93,6 +98,10 @@ int VictimCache::accept(int addr, int data[], int size, bool is_dirty, bool is_v
 
     int latency = 0;
     int way = this->select_victim_way(index);
+
+    for (int i = 0; i < n_ways_; i++) {
+        ways_[i][index].age++;
+    }
 
     if (ways_[way][index].valid) {
         log("%6s evict way %d [tag %d], which is %s",

@@ -73,6 +73,10 @@ int Cache::read(int addr, int size, CacheLine *block)
     this->extract(addr, tag, index, offset);
 
     for (int i = 0; i < n_ways_; i++) {
+        ways_[i][index].age++;
+    }
+
+    for (int i = 0; i < n_ways_; i++) {
         auto& cache_line = ways_[i][index];
         if (cache_line.valid && (cache_line.tag == tag)) {
             // TODO 读取块内数据
@@ -115,6 +119,10 @@ int Cache::write(int addr, int size)
 
     int tag, index, offset;
     this->extract(addr, tag, index, offset);
+
+    for (int i = 0; i < n_ways_; i++) {
+        ways_[i][index].age++;
+    }
 
     for (int i = 0; i < n_ways_; i++) {
         auto& cache_line = ways_[i][index];
