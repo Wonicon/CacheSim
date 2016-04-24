@@ -12,9 +12,12 @@ read_counter(0),
 write_counter(0)
 {}
 
-int Memory::read(int addr, int size, int &data)
+int Memory::read(int addr, int size, CacheLine *block)
 {
     this->read_counter++;
+    if (block) {
+        block->dirty = false;  // 由于有备份，无需传递脏信息
+    }
     return latency;
 }
 

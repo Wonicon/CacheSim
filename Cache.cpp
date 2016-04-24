@@ -62,10 +62,9 @@ void Cache::extract(int addr, int &tag, int &index, int &offset)
     tag = (~((1 << (index_width_ + offset_width_)) - 1) & static_cast<unsigned>(addr)) >> (index_width_ + offset_width_);
     index = ((((1 << index_width_) - 1) << offset_width_) & static_cast<unsigned>(addr)) >> offset_width_;
     offset = ((1 << offset_width_) - 1) & addr;
-    //printf("A(0x%08x) => %x | %x | %x\n", addr, tag, index, offset);
 }
 
-int Cache::read(int addr, int size, int& data)
+int Cache::read(int addr, int size, CacheLine *block)
 {
     count_rd_++;
 
@@ -76,6 +75,9 @@ int Cache::read(int addr, int size, int& data)
         auto& cache_line = ways_[i][index];
         if (cache_line.valid && (cache_line.tag == tag)) {
             // TODO 读取块内数据
+            if (block) {
+                block->dirty = false;  // 由于有备份，无需传递脏信息
+            }
             return latency_;
         }
     }
@@ -158,8 +160,7 @@ int Cache::load_block(int way, int addr)
 
     if (0 <= way && way < n_ways_) {
         // 逐字写入
-        int data;
-        latency = depend_.read(addr, block_size_, data);
+        latency = depend_.read(addr, block_size_, &ways_[way][index]);
     }
     else {
         fprintf(stderr, "bad way %d\n", way);
@@ -167,7 +168,6 @@ int Cache::load_block(int way, int addr)
 
     ways_[way][index].update_tag(tag);
     ways_[way][index].valid = true;
-    ways_[way][index].dirty = false; // TODO wrong!
     return latency;
 }
 

@@ -12,12 +12,17 @@ VictimCache::VictimCache(const char *name, unsigned int cache_size, unsigned int
 Cache(name, cache_size, block_size, cache_size / block_size, 1, depend)
 { }
 
-int VictimCache::read(int addr, int size, int& data)
+int VictimCache::read(int addr, int size, CacheLine *block)
 {
+    count_rd_++;
+
     if (is_waiting_swap_) {
         int request = (addr >> offset_width_) << offset_width_;
         if (request == addr_to_swap_) {
             is_waiting_swap_ = false;
+            if (block) {
+                block->dirty = true;  // 由于无备份，需要传递脏信息
+            }
             return latency_;
         }
         assert(0);
@@ -34,11 +39,13 @@ int VictimCache::read(int addr, int size, int& data)
         }
     }
 
+    count_rd_miss_++;
+
     log("%6s  read miss at 0x%08x [tag %d index %d]",
             label_, addr, tag, index);
 
     // 既不载入、也不替换，相当于把访存转发给上层 cache
-    return latency_ + depend_.read(addr, size, data);
+    return latency_ + depend_.read(addr, size);
 }
 
 int VictimCache::write(int addr, int size)

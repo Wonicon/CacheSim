@@ -38,7 +38,7 @@ void CPU::exec(const char *trace_file)
         n_instr++;
         int latency = 0;
         if (method == LOAD) {
-            latency = this->mem.read(addr, SIZE, data);
+            latency = this->mem.read(addr, SIZE);
         }
         else if (method == STORE) {
             latency = this->mem.write(addr, SIZE);

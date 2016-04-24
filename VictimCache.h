@@ -20,7 +20,7 @@
 class VictimCache : public Cache {
 public:
     VictimCache(const char *name, unsigned int cache_size, unsigned block_size, Storage& depend);
-    virtual int read(int addr, int size, int& data);
+    virtual int read(int addr, int size, CacheLine *block = nullptr);
     virtual int write(int addr, int size);
     virtual int accept(int addr, int data[], int size, bool is_dirty, bool is_victim = false, int cause = 0) override;
 private:

@@ -14,7 +14,7 @@
 class Memory : public Storage {
 public:
     Memory(int latency);
-    virtual int read(int addr, int size, int& data);
+    virtual int read(int addr, int size, CacheLine *block = nullptr);
     virtual int write(int addr, int size);
     int getAccessTimes(void) const { return read_counter + write_counter; }
 private:
