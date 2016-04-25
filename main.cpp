@@ -20,27 +20,23 @@ int main(int argc, char *argv[])
     }
 
     {
-        printf("===== L1 64KB / 8B Direct =====\n");
+        printf("===== L1_1 64KB / 8B Direct =====\n");
         Memory ram(100);
         Cache L1("L1", 64 * 1024, 8, 1, 1, ram);
         CPU cpu(L1);
         cpu.exec(argv[1]);
-        printf("cpu cycles: %d\n", cpu.getCycles());
-        printf("mem access: %d\n", ram.getAccessTimes());
-        printf("miss rate %f\n", L1.get_miss_rate());
+        cpu.summary();
     }
     {
-        printf("===== L1 32KB / 32B / 4 ways LRU =====\n");
+        printf("===== L1_2 32KB / 32B / 4 ways LRU =====\n");
         Memory ram(100);
         Cache L1("L1", 32 * 1024, 32, 4, 1, ram, true);
         CPU cpu(L1);
         cpu.exec(argv[1]);
-        printf("cpu cycles: %d\n", cpu.getCycles());
-        printf("mem access: %d\n", ram.getAccessTimes());
-        printf("miss rate %f\n", L1.get_miss_rate());
+        cpu.summary();
     }
     {
-        printf("===== L1 8KB / 64B / Full Random =====\n");
+        printf("===== L1_3 8KB / 64B / Full Random =====\n");
         Memory ram(100);
         Cache L1("L1", 8 * 1024, 64, (8 * 1024 / 64), 1, ram);
         CPU cpu(L1);
