@@ -202,12 +202,6 @@ int Cache::select_victim_way(int line)
             return i;
         }
     }
-    // 然后是不脏的
-    for (int i = 0; i < n_ways_; i++) {
-        if (!ways_[i][line].dirty) {
-            return i;
-        }
-    }
 
     if (use_lru_) {
         int max_way = 0;
@@ -219,6 +213,12 @@ int Cache::select_victim_way(int line)
         return max_way;
     }
     else {
+        // 然后是不脏的
+        for (int i = 0; i < n_ways_; i++) {
+            if (!ways_[i][line].dirty) {
+                return i;
+            }
+        }
         return static_cast<unsigned>(rand()) % n_ways_;
     }
 }
