@@ -233,7 +233,10 @@ int Cache::evict(int way, int line, int cause)
 void Cache::summary() const
 {
     printf("%s access: %d\n", label_, count_rd_ + count_wr_);
+    printf("%s access hit: %d\n", label_, count_rd_ + count_wr_ - count_rd_miss_ - count_wr_miss_);
     printf("%s loads: %d\n", label_, count_rd_);
+    printf("%s loads hit: %d\n", label_, count_rd_ - count_rd_miss_);
     printf("%s stores: %d\n", label_, count_wr_);
+    printf("%s stores hit: %d\n", label_, count_wr_ - count_wr_miss_);
     depend_.summary();
 }
